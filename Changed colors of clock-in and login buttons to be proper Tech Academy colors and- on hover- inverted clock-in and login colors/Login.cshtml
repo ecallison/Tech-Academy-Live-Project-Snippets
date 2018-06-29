@@ -1,0 +1,7 @@
+  }
+                @* Username is in the Db && doesn't have an end time, change btn to display Clock out *@
+                else {  // data == 2
+                    $("#clockInOutBtn").prop('disabled', false).val('Clock out').css("background-color", "#FFB035", "border-color", "#1a2b51");
+                    $("#UserName").css("border-color", "Green");
+                    $("#currentWorkTimeEventHours").html(data.ClockInOut);
+                    $("#newMessagesNotification").html(data.newMessagesNotification); // show New Messages notification if any
