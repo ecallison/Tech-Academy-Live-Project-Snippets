@@ -1,0 +1,12 @@
+ </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>
+                        @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { })
+                    </li>
+                    <li>
+                        @Html.ActionLink("Time Off Requests", "Index", "TimeOffEvent")
+                    </li>
+                </ul>
+                @Html.Partial("_LoginPartial")
+            </div>
