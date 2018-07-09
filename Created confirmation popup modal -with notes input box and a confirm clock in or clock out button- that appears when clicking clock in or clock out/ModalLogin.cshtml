@@ -1,0 +1,105 @@
+ @using (Ajax.BeginForm("ProcessUserClockIn", "Account", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "OnSuccess(data)" }, new { @class = "form-horizontal", id="login-form", role = "form" }))
+                {
+                @Html.AntiForgeryToken()
+
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    <div class="col-md-10">
+                        <div class="uNPassword">
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", id = "UserName", placeholder = "username", onchange = "UserCheck()" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-10">
+                        <div class="uNPassword">
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control", id = "Pass", placeholder = "password" })
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="checkbox" class="form-group-input" id="exampleCheck1">
+                    <label class="form-check-label" for="exampleCheck1">Remember Me</label>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        @*<input type="submit" class="Button" value="Clock in" formaction=@Url.Action("Create", "WorkTimeEvent") formmethod="post" class="btn btn-default" id="clockInOutBtn" />
+                            <input type="submit" class="Button" value="Log in" />*@
+                        <input type="submit" class="login-button" id="clockInOutBtn" value="Clock In" name="updateInfo" />
+                        <input type="submit" class="login-button" value="Log In" name="updateInfo" />
+                    </div>
+                </div>
+
+                //Pop-up modal for clock-in confirmation
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel"><span id="clockModalLabel"></span> - <span id="clockModalFNameLabel"></span>  <span id="clockModalLNameLabel"></span></h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="clockModalNotes">
+                                    @Html.TextBoxFor(m => m.Note, new { @class = "form-control", id = "modalNote", placeholder = "note (optional)" })
+                                </div>
+                                <div class="modal-footer">
+                                    <input type="submit" class="clock-button" id="modalConfirm2" value="Confirm Clock In" name="updateInfo" onclick="form_submit" @*data-dismiss="modal"*@ />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <span id="clockInErrorMessage"></span>
+                <div id="currentWorkTimeEventHours"></div>
+                }
+            </section>
+        </div>
+    </div>
+</div>
+
+@******************************************************************************
+                     GENERATE MODAL IF USERNAME AND PASSWORD ARE VALIDs
+    ****************************************************************************** *@
+<script>
+    function OnSuccess(data) {
+    
+        //logging in = false - login failed for some reason show error
+        if (data.LoggingIn == true) {
+            window.location.href = "http://localhost:59611/WorkTimeEvent/Index";
+        }
+        else if (data.LoggingIn == false) {
+            $('#clockInErrorMessage').html("There was a problem with the password or username, please try again or contact you system administrator if the problem continues.");
+        }
+        else if (data.LoggingIn == null) {
+            //for updating modal display between clockin and clockout
+            //Clock in logic
+            if (data.ClockingIn == true) {
+                $('#clockModalLabel').html("CLOCK IN");
+                $('#clockModalFNameLabel').html(data.FirstName);
+                $('#clockModalLNameLabel').html(data.LastName);
+                $('#exampleModal').modal('show');
+            }
+            else if (data.ClockingIn == null) {
+                window.location.href = "http://localhost:59611";
+            }
+            //Clock out logic
+            else {
+                $('#clockModalLabel').prop('disabled', false).html("CLOCK OUT");
+                $('#clockModalFNameLabel').html(data.FirstName);
+                $('#clockModalLNameLabel').html(data.LastName);
+                $('#modalNote').val(data.Note);
+                $("#modalConfirm2").val('Confirm Clock Out');
+                $('#exampleModal').modal('show');
+            }
+        }
+    }
+    //submit clock in or clock out information upon clicking "Confirm Clock In"
+    function form_submit() {
+        document.getElementByID("login-form").submit();
+    }
+</script>
